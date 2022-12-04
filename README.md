@@ -9,3 +9,4 @@ note: currently SD2.0 is not supported
 
 ![image](https://github.com/tkalayci71/embedding-inspector/blob/main/embedding_inspector/ss1.jpg)
 ![image](https://github.com/tkalayci71/embedding-inspector/blob/main/embedding_inspector/ss2.jpg)
+![image](https://github.com/tkalayci71/embedding-inspector/blob/main/embedding_inspector/ss3.jpg)
