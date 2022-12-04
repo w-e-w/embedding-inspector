@@ -21,7 +21,7 @@ Download ![embedding-inspector-main.zip](https://github.com/tkalayci71/embedding
 
 Stable Diffusion contains a database of ~49K words/tokens, and their numerical representations called embeddings. Your prompt is first tokenized using this database. For example, since the word "cat" is in the database it will be tokenized as a single item, but the word "catnip" is not in the database,  so will be tokenized as two items, "cat" and "nip". 
 
-New tokens/concepts can also be loaded from embeddings folder. They are usually generated via textual inversion, or you can download some from ![Stable Diffusion concepts library](https://huggingface.co/sd-concepts-library) With Embedding-inspector you can inspect and mix embeddings both from the internal database and the loaded database.
+New tokens/concepts can also be loaded from embeddings folder. They are usually generated via textual inversion, or you can download some from [Stable Diffusion concepts library](https://huggingface.co/sd-concepts-library). With Embedding-inspector you can inspect and mix embeddings both from the internal database and the loaded database.
 
 # Screenshots
 
