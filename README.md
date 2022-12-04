@@ -3,7 +3,7 @@ for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/sta
 
 With this extension you can inspect internal/loaded embeddings and find out which embeddings are similar, and you can mix them to create new embeddings.
 
-note: currently SD2.0 is not supported
+note: currently SD2.0 is not supported and only 1-vector embeddings are supported for mixing.
 
 Inspired by [Embeddings editor](https://github.com/CodeExplode/stable-diffusion-webui-embedding-editor.git) and ![Tokenizer](https://github.com/AUTOMATIC1111/stable-diffusion-webui-tokenizer.git) extensions.
 
