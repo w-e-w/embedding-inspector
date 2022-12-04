@@ -5,6 +5,10 @@ With this extension you can inspect internal/loaded embeddings and find out whic
 
 note: currently SD2.0 is not supported
 
+# Installation
+
+Download ![embedding-inspector-main.zip](https://github.com/tkalayci71/embedding-inspector/archive/refs/heads/main.zip) and extract embedding_inspector folder into extensions folder.
+
 # Screenshots
 
 ![image](https://github.com/tkalayci71/embedding-inspector/blob/main/embedding_inspector/ss1.jpg)
