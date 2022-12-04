@@ -15,7 +15,7 @@ Download ![embedding-inspector-main.zip](https://github.com/tkalayci71/embedding
 
 1) Enter a token name into "Text Input" box and click "Inspect" button. Only the first token found in the text input will be processed. Below, some information about the token will be displayed, and similar embeddings will be listed in the order of their similarity. This is useful to check if a word is in the token database, find internal tokens that are similar to loaded embeddings, and also to discover related unicode emojis.
 
-2) Enter one or more token names in the "mix0", "mix1"... boxes, adjust their weights with "Mul" sliders, enter a unique name in "Filename" box, click "Save mixed" button. This will save the mixed embedding into the embeddings folder. If the file already exists, "Enable overwrite" box must be checked to allow overwriting it.  Then, you use the filename as a keyword in your prompt.
+2) Enter one or more token names in the "mix0", "mix1"... boxes, adjust their weights with "Mul" sliders, enter a unique name in "Filename" box, click "Save mixed" button. This will create a new embedding (mixed from the given embeddings and weights) and save it in the embeddings folder. If the file already exists, "Enable overwrite" box must be checked to allow overwriting it.  Then, you use the filename as a keyword in your prompt.
 
 # Background information
 
