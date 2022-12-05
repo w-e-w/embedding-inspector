@@ -7,7 +7,7 @@ Inspired by [Embeddings editor](https://github.com/CodeExplode/stable-diffusion-
 
 # Manual Installation
 
-Download ![embedding-inspector-main.zip](https://github.com/tkalayci71/embedding-inspector/archive/refs/heads/main.zip) and into extensions folder.
+Download ![embedding-inspector-main.zip](https://github.com/tkalayci71/embedding-inspector/archive/refs/heads/main.zip) and extract into extensions folder.
 
 # Usage
 
