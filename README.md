@@ -1,9 +1,11 @@
-# Embedding-inspector extension version 2.0 - 2022.12.06
+# Embedding-inspector extension version 2.1 - 2022.12.07
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
 With this extension you can inspect internal/loaded embeddings and find out which embeddings are similar, and you can mix them to create new embeddings.
 
 Inspired by [Embeddings editor](https://github.com/CodeExplode/stable-diffusion-webui-embedding-editor.git) and ![Tokenizer](https://github.com/AUTOMATIC1111/stable-diffusion-webui-tokenizer.git) extensions.
+
+new in v2.1: entering embedding ID instead of name is now supported, for example you can enter "#2368" instead of "cat"
 
 # Manual Installation
 
