@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.2 - 2022.12.08
+# version 2.3 - 2022.12.08
 #
 
 import gradio as gr
@@ -250,6 +250,34 @@ def do_save(*args):
 
 #-------------------------------------------------------------------------------
 
+def do_listloaded():
+
+    tokenizer, internal_embs, loaded_embs = get_data()
+
+    results = []
+    results.append('Loaded embeddings ('+str(len(loaded_embs))+'):')
+    results.append('')
+
+    for key in loaded_embs.keys():
+
+        try:
+            emb = loaded_embs.get(key)
+
+            r = []
+            r.append(str(emb.name))
+            r.append('    ['+str(emb.checksum())+']')
+            r.append('    Vectors: '+str(emb.vec.shape[0])+' x ' +str(emb.vec.shape[1]))
+            if (emb.sd_checkpoint_name!=None): r.append('    Ckpt:'+str(emb.sd_checkpoint_name))
+            results.append(''.join(r))
+
+        except:
+            results.append('!error!')
+            continue
+
+    return '\n'.join(results)  # return info string to textbox
+
+#-------------------------------------------------------------------------------
+
 def add_tab():
     with gr.Blocks(analytics_enabled=False) as ui:
         with gr.Tabs():
@@ -257,7 +285,9 @@ def add_tab():
 
                 with gr.Column(variant='panel'):
                     text_input = gr.Textbox(label="Text input", lines=1, placeholder="Enter embedding name (only first token is processed), or embedding ID as #nnnnn")
-                    inspect_button = gr.Button(value="Inspect", variant="primary")
+                    with gr.Row():
+                        inspect_button = gr.Button(value="Inspect", variant="primary")
+                        listloaded_button = gr.Button(value="List loaded embeddings")
                     inspect_result = gr.Textbox(label="Results", lines=15)
 
                 with gr.Column(variant='panel'):
@@ -278,6 +308,7 @@ def add_tab():
                     with gr.Row():
                         save_result = gr.Textbox(label="Log", lines=5)
 
+            listloaded_button.click(fn=do_listloaded, outputs=inspect_result)
             inspect_button.click(fn=do_inspect,inputs=[text_input],outputs=[inspect_result])
             save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[save_name,enable_overwrite,step_box],outputs=save_result)
 
