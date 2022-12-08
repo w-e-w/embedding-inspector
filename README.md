@@ -13,7 +13,9 @@ v2.1: Entering embedding ID instead of name is now supported, for example you ca
 
 v2.2: Entering a step value (like 1000) is now supported. This is needed only if you will continue training this embedding. Also, step and checkpoint info for loaded embeddings are now displayed.
 
-v2.3: Added List loaded embeddings button
+v2.3: Added "List loaded embeddings" button
+
+v2.4: Added "Concat mode" option. In this mode, embeddings will be just combined instead of being mixed. For example, "mona" and "lisa" can be combined into a single embedding "monalisa" which will contain 2 vectors, and the result will be the same as having "mona lisa" in the prompt, but with a single keyword.
 
 # Manual Installation
 
