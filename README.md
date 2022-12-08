@@ -1,4 +1,4 @@
-# Embedding-inspector extension version 2.2 - 2022.12.08
+# Embedding-inspector extension version 2.3 - 2022.12.08
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
 With this extension you can inspect internal/loaded embeddings and find out which embeddings are similar, and you can mix them to create new embeddings.
@@ -11,7 +11,9 @@ v2.0: SD2.0 and multi-vector support
 
 v2.1: Entering embedding ID instead of name is now supported, for example you can enter "#2368" instead of "cat"
 
-2.2: Entering a step value (like 1000) is now supported. This is needed only if you will continue training this embedding. Also, step and checkpoint info for loaded embeddings are now displayed.
+v2.2: Entering a step value (like 1000) is now supported. This is needed only if you will continue training this embedding. Also, step and checkpoint info for loaded embeddings are now displayed.
+
+v2.3: Added List loaded embeddings button
 
 # Manual Installation
 
