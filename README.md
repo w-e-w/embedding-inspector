@@ -17,6 +17,8 @@ v2.3: Added "List loaded embeddings" button
 
 v2.4: Added "Concat mode" option. In this mode, embeddings will be just combined instead of being mixed. For example, "mona" and "lisa" can be combined into a single embedding "monalisa" which will contain 2 vectors, and the result will be the same as having "mona lisa" in the prompt, but with a single keyword.
 
+v2.5 Added "global multiplier" option, which is useful to adjust strength in concat mode. Added a mini tokenizer. You can select "Send IDs to mixer" option to automate converting a short prompt to an embedding.
+
 # Manual Installation
 
 Download ![embedding-inspector-main.zip](https://github.com/tkalayci71/embedding-inspector/archive/refs/heads/main.zip) and extract into extensions folder.
