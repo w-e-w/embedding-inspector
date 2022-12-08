@@ -37,9 +37,9 @@ Download ![embedding-inspector-main.zip](https://github.com/tkalayci71/embedding
 
 3) Enter a short prompt in mini tokenizer text box, select "Send IDs to mixer" option, click "Tokenize". In the mixer section IDs will be have been copied and "Concat mode" checked. Adjust multiplier and global multiplier sliders if necessary, enter a filename and click "Save mixed" button. Then use the filename as a keyword in your prompt.
 
-![image](screenshot4.jpg)
 ![image](screenshot5.jpg)
 ![image](screenshot6.jpg)
+![image](screenshot7.jpg)
 
 # Background information
 
