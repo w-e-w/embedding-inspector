@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.4 - 2022.12.08
+# version 2.5 - 2022.12.08
 #
 
 import gradio as gr
@@ -10,11 +10,7 @@ import torch, os
 from modules.sd_hijack_open_clip import tokenizer as open_clip_tokenizer
 from modules.textual_inversion.textual_inversion import Embedding
 
-MAX_NUM_MIX = 5 # number of embeddings that can be mixed
-SLIDER_MAX = 1.00 # mix slider max value
-SLIDER_MIN = -1.00 # mix slider min value
-SLIDER_DEF = 0.5 # mix slider default value
-SLIDER_STEP = 0.1 # mix slider step value
+MAX_NUM_MIX = 6 # number of embeddings that can be mixed
 MAX_SIMILAR_EMBS = 30 # number of similar embeddings to show
 VEC_SHOW_TRESHOLD = 1 # formatting for printing tensors
 SEP_STR = '-'*80 # separator string
@@ -178,6 +174,7 @@ def do_save(*args):
     enable_overwrite = args[-2]
     step_text = args[-1].strip()
     concat_mode = args[-4]
+    global_mul =  args[-5]
     if save_name=='':return 'Filename is empty'
 
     results = []
@@ -239,6 +236,9 @@ def do_save(*args):
     if (tot_vec==None):
         results.append('No embeddings were mixed, nothing to save')
     else:
+        tot_vec = tot_vec*global_mul
+        if (global_mul!=1.0): results.append('x global multiplier '+str(global_mul))
+
         new_emb = Embedding(tot_vec, save_name)
         if (step_val!=None):
             new_emb.step = step_val
@@ -286,6 +286,35 @@ def do_listloaded():
 
 #-------------------------------------------------------------------------------
 
+def do_minitokenize(*args):
+
+    mini_input=args[-1].strip()
+    mini_sendtomix = args[-2]
+    concat_mode = args[-3]
+    mix_inputs = args[0:MAX_NUM_MIX]
+
+    tokenizer, internal_embs, loaded_embs = get_data()
+
+    results = []
+
+    mix_inputs_list = list(mix_inputs)
+
+    found_ids = text_to_emb_ids(mini_input, tokenizer)
+    for i in range(len(found_ids)):
+        idstr = '#'+str(found_ids[i])
+        results.append(idstr)
+        if (mini_sendtomix==True):
+            if (i<MAX_NUM_MIX): mix_inputs_list[i]=idstr
+
+    if (mini_sendtomix==True):
+        concat_mode = True
+        for i in range(MAX_NUM_MIX):
+            if (i>=len(found_ids)): mix_inputs_list[i]=''
+
+    return *mix_inputs_list,concat_mode,' '.join(results)# return everything
+
+#-------------------------------------------------------------------------------
+
 def add_tab():
     with gr.Blocks(analytics_enabled=False) as ui:
         with gr.Tabs():
@@ -298,6 +327,13 @@ def add_tab():
                         listloaded_button = gr.Button(value="List loaded embeddings")
                     inspect_result = gr.Textbox(label="Results", lines=15)
 
+                    with gr.Column(variant='panel'):
+                        mini_input = gr.Textbox(label="Mini tokenizer", lines=1, placeholder="Enter a short prompt (loaded embeddings or modifiers are not supported)")
+                        with gr.Row():
+                            mini_tokenize = gr.Button(value="Tokenize", variant="primary")
+                            mini_sendtomix = gr.Checkbox(value=False, label="Send IDs to mixer")
+                        mini_result = gr.Textbox(label="Tokens", lines=1)
+
                 with gr.Column(variant='panel'):
                     mix_inputs = []
                     mix_sliders = []
@@ -306,12 +342,16 @@ def add_tab():
                            with gr.Column():
                                mix_inputs.append(gr.Textbox(label="Name "+str(n), lines=1, placeholder="Enter name of embedding to mix"))
                            with gr.Column():
-                               mix_sliders.append(gr.Slider(label="Multiplier",value=SLIDER_DEF,minimum=SLIDER_MIN, maximum=SLIDER_MAX, step=SLIDER_STEP))
+                               mix_sliders.append(gr.Slider(label="Multiplier",value=1.0,minimum=-1.0, maximum=1.0, step=0.1))
+
+                    with gr.Row():
+                            concat_mode = gr.Checkbox(value=False,label="Concat mode")
+                            global_mul = gr.Slider(label="Global Multiplier",value=1.0,minimum=-10.0, maximum=10.0, step=1.0)
+                            step_box = gr.Textbox(label="Step",lines=1,placeholder='only for training')
+
                     with gr.Row():
                         save_name = gr.Textbox(label="Filename",lines=1,placeholder='Enter file name to save')
                         save_button = gr.Button(value="Save mixed", variant="primary")
-                        step_box = gr.Textbox(label="Step",lines=1,placeholder='only for training')
-                        concat_mode = gr.Checkbox(value=False,label="Concat mode")
                         enable_overwrite = gr.Checkbox(value=False,label="Enable overwrite")
 
                     with gr.Row():
@@ -319,7 +359,9 @@ def add_tab():
 
             listloaded_button.click(fn=do_listloaded, outputs=inspect_result)
             inspect_button.click(fn=do_inspect,inputs=[text_input],outputs=[inspect_result])
-            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[concat_mode,save_name,enable_overwrite,step_box],outputs=save_result)
+            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[global_mul, concat_mode,save_name,enable_overwrite,step_box],outputs=save_result)
+
+            mini_tokenize.click(fn=do_minitokenize,inputs=mix_inputs+[concat_mode, mini_sendtomix, mini_input], outputs=mix_inputs+[concat_mode,mini_result])
 
     return [(ui, "Embedding Inspector", "inspector")]
 
