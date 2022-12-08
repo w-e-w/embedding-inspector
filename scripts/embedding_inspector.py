@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.3 - 2022.12.08
+# version 2.4 - 2022.12.08
 #
 
 import gradio as gr
@@ -177,6 +177,7 @@ def do_save(*args):
     save_name = args[-3].strip()
     enable_overwrite = args[-2]
     step_text = args[-1].strip()
+    concat_mode = args[-4]
     if save_name=='':return 'Filename is empty'
 
     results = []
@@ -194,7 +195,7 @@ def do_save(*args):
         step_val = int(step_text)
     except:
         step_val = None
-        results.append('Step value is invalid, ignoring')
+        if (step_text!=''): results.append('Step value is invalid, ignoring')
 
     # calculate mixed embedding in tot_vec
     vec_size = None
@@ -214,18 +215,25 @@ def do_save(*args):
                 results.append('! Vector size is not compatible, skipping '+emb_name+'('+str(emb_id)+')')
                 continue
 
-        if tot_vec==None:
-            tot_vec = torch.zeros(vec_size).unsqueeze(0)
+        if not(concat_mode):
+            if tot_vec==None:
+                tot_vec = torch.zeros(vec_size).unsqueeze(0)
 
-        if mix_vec.shape[0]!=tot_vec.shape[0]:
-            padding = torch.zeros(abs(tot_vec.shape[0]-mix_vec.shape[0]),vec_size)
-            if mix_vec.shape[0]<tot_vec.shape[0]:
-                mix_vec = torch.cat([mix_vec, padding])
+            if mix_vec.shape[0]!=tot_vec.shape[0]:
+                padding = torch.zeros(abs(tot_vec.shape[0]-mix_vec.shape[0]),vec_size)
+                if mix_vec.shape[0]<tot_vec.shape[0]:
+                    mix_vec = torch.cat([mix_vec, padding])
+                else:
+                    tot_vec = torch.cat([tot_vec, padding])
+
+            tot_vec+= mix_vec * mixval
+            results.append('+ '+emb_name+'('+str(emb_id)+')'+' x '+str(mixval))
+        else:
+            if tot_vec==None:
+                tot_vec = mix_vec
             else:
-                tot_vec = torch.cat([tot_vec, padding])
-
-        tot_vec+= mix_vec * mixval
-        results.append('+ '+emb_name+'('+str(emb_id)+')'+' x '+str(mixval))
+                tot_vec = torch.cat([tot_vec,mix_vec])
+            results.append('> '+emb_name+'('+str(emb_id)+')'+' x '+str(mixval))
 
     # save the mixed embedding
     if (tot_vec==None):
@@ -303,6 +311,7 @@ def add_tab():
                         save_name = gr.Textbox(label="Filename",lines=1,placeholder='Enter file name to save')
                         save_button = gr.Button(value="Save mixed", variant="primary")
                         step_box = gr.Textbox(label="Step",lines=1,placeholder='only for training')
+                        concat_mode = gr.Checkbox(value=False,label="Concat mode")
                         enable_overwrite = gr.Checkbox(value=False,label="Enable overwrite")
 
                     with gr.Row():
@@ -310,7 +319,7 @@ def add_tab():
 
             listloaded_button.click(fn=do_listloaded, outputs=inspect_result)
             inspect_button.click(fn=do_inspect,inputs=[text_input],outputs=[inspect_result])
-            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[save_name,enable_overwrite,step_box],outputs=save_result)
+            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[concat_mode,save_name,enable_overwrite,step_box],outputs=save_result)
 
     return [(ui, "Embedding Inspector", "inspector")]
 
