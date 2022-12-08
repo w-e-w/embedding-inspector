@@ -227,9 +227,9 @@ def do_save(*args):
             results.append('+ '+emb_name+'('+str(emb_id)+')'+' x '+str(mixval))
         else:
             if tot_vec==None:
-                tot_vec = mix_vec
+                tot_vec = mix_vec*mixval
             else:
-                tot_vec = torch.cat([tot_vec,mix_vec])
+                tot_vec = torch.cat([tot_vec,mix_vec*mixval])
             results.append('> '+emb_name+'('+str(emb_id)+')'+' x '+str(mixval))
 
     # save the mixed embedding
