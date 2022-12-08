@@ -30,10 +30,16 @@ Download ![embedding-inspector-main.zip](https://github.com/tkalayci71/embedding
 ![image](screenshot1.jpg)
 ![image](screenshot4.jpg)
 
-2) Enter one or more token names in the "Name 0", "Name 1"... boxes, adjust their weights with "Multiplier" sliders, enter a unique name in "Filename" box, click "Save mixed" button. This will create a new embedding (mixed from the given embeddings and weights) and save it in the embeddings folder. If the file already exists, "Enable overwrite" box must be checked to allow overwriting it.  Then, you use the filename as a keyword in your prompt.
+2) Enter one or more token names in the "Name 0", "Name 1"... boxes, adjust their weights with "Multiplier" sliders, enter a unique name in "Filename" box, click "Save mixed" button. This will create a new embedding (mixed from the given embeddings and weights) and save it in the embeddings folder. If the file already exists, "Enable overwrite" box must be checked to allow overwriting it. Then, you use the filename as a keyword in your prompt.
 
 ![image](screenshot2.jpg)
 ![image](screenshot3.jpg)
+
+3) Enter a short prompt in mini tokenizer text box, select "Send IDs to mixer" option, click "Tokenize". In the mixer section IDs will be have been copied and "Concat mode" checked. Adjust multiplier and global multiplier sliders if necessary, enter a filename and click "Save mixed" button. Then use the filename as a keyword in your prompt.
+
+![image](screenshot4.jpg)
+![image](screenshot5.jpg)
+![image](screenshot6.jpg)
 
 # Background information
 
