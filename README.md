@@ -11,7 +11,7 @@ v2.0: SD2.0 and multi-vector support
 
 v2.1: Entering embedding ID instead of name is now supported, for example you can enter "#2368" instead of "cat"
 
-2.2: Entering a step value (like 1000) is now supported. This is needed only if you will continue training this embedding
+2.2: Entering a step value (like 1000) is now supported. This is needed only if you will continue training this embedding. Also, step and checkpoint info for loaded embeddings are now displayed.
 
 # Manual Installation
 
