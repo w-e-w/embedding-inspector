@@ -5,9 +5,11 @@ With this extension you can inspect internal/loaded embeddings and find out whic
 
 Inspired by [Embeddings editor](https://github.com/CodeExplode/stable-diffusion-webui-embedding-editor.git) and ![Tokenizer](https://github.com/AUTOMATIC1111/stable-diffusion-webui-tokenizer.git) extensions.
 
-new in v2.1: entering embedding ID instead of name is now supported, for example you can enter "#2368" instead of "cat"
+# What's new
 
-new in 2.2: entering a step value (like 1000) is now supported. This is needed only if you will continue training this embedding
+v2.0: SD2.0 and multi-vector support 
+v2.1: Entering embedding ID instead of name is now supported, for example you can enter "#2368" instead of "cat"
+2.2: Entering a step value (like 1000) is now supported. This is needed only if you will continue training this embedding
 
 # Manual Installation
 
