@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.1 - 2022.12.07
+# version 2.2 - 2022.12.08
 #
 
 import gradio as gr
@@ -80,7 +80,7 @@ def get_embedding_info(text):
         emb_name = loaded_emb.name
         emb_id = '['+loaded_emb.checksum()+']' # emb_id is string for loaded embeddings
         emb_vec = loaded_emb.vec
-        return emb_name, emb_id, emb_vec
+        return emb_name, emb_id, emb_vec, loaded_emb #also return loaded_emb reference
 
     # support for #nnnnn format
     val = None
@@ -96,23 +96,23 @@ def get_embedding_info(text):
         emb_id = val
     else:
         emb_ids = text_to_emb_ids(text, tokenizer)
-        if len(emb_ids)==0: return None, None, None
+        if len(emb_ids)==0: return None, None, None, None
         emb_id = emb_ids[0] # emb_id is int for internal embeddings
 
     emb_name = emb_id_to_name(emb_id, tokenizer)
     emb_vec = internal_embs[emb_id].unsqueeze(0)
 
-    return emb_name, emb_id, emb_vec # return embedding name, ID, vector
+    return emb_name, emb_id, emb_vec, None # return embedding name, ID, vector
 
 #-------------------------------------------------------------------------------
 
 def do_inspect(text):
 
     text = text.strip()
-    if (text==''): return 'Need embedding name or embeddig ID as #nnnnn'
+    if (text==''): return 'Need embedding name or embedding ID as #nnnnn'
 
     # get the embedding info for first token in text
-    emb_name, emb_id, emb_vec = get_embedding_info(text)
+    emb_name, emb_id, emb_vec, loaded_emb = get_embedding_info(text)
     if (emb_name==None) or (emb_id==None) or (emb_vec==None):
         return 'An error occurred'
 
@@ -124,6 +124,12 @@ def do_inspect(text):
         results.append('Embedding ID: '+str(emb_id)+' (internal)')
     else:
         results.append('Embedding ID: '+str(emb_id)+' (loaded)')
+
+    if loaded_emb!=None:
+        results.append('Step: '+str(loaded_emb.step))
+        results.append('SD checkpoint: '+str(loaded_emb.sd_checkpoint))
+        results.append('SD checkpoint name: '+str(loaded_emb.sd_checkpoint_name))
+
     vec_count = emb_vec.shape[0]
     vec_size = emb_vec.shape[1]
     results.append('Vector count: '+str(vec_count))
@@ -168,8 +174,9 @@ def do_inspect(text):
 def do_save(*args):
 
     # do some checks
-    save_name = args[-2].strip()
-    enable_overwrite = args[-1]
+    save_name = args[-3].strip()
+    enable_overwrite = args[-2]
+    step_text = args[-1].strip()
     if save_name=='':return 'Filename is empty'
 
     results = []
@@ -182,6 +189,12 @@ def do_save(*args):
         else:
             results.append('File already exists, overwrite is enabled')
 
+    step_val = None
+    try:
+        step_val = int(step_text)
+    except:
+        step_val = None
+        results.append('Step value is invalid, ignoring')
 
     # calculate mixed embedding in tot_vec
     vec_size = None
@@ -191,7 +204,7 @@ def do_save(*args):
         mixval = args[k+MAX_NUM_MIX]
         if (name=='') or (mixval==0): continue
 
-        emb_name, emb_id, emb_vec = get_embedding_info(name)
+        emb_name, emb_id, emb_vec, loaded_emb = get_embedding_info(name)
         mix_vec = emb_vec.to(device='cpu',dtype=torch.float32)
 
         if vec_size==None:
@@ -219,6 +232,10 @@ def do_save(*args):
         results.append('No embeddings were mixed, nothing to save')
     else:
         new_emb = Embedding(tot_vec, save_name)
+        if (step_val!=None):
+            new_emb.step = step_val
+            results.append('Setting step value to '+str(step_val))
+
         try:
             new_emb.save(save_filename)
             results.append('Saved "'+save_filename+'"')
@@ -255,13 +272,14 @@ def add_tab():
                     with gr.Row():
                         save_name = gr.Textbox(label="Filename",lines=1,placeholder='Enter file name to save')
                         save_button = gr.Button(value="Save mixed", variant="primary")
+                        step_box = gr.Textbox(label="Step",lines=1,placeholder='only for training')
                         enable_overwrite = gr.Checkbox(value=False,label="Enable overwrite")
 
                     with gr.Row():
                         save_result = gr.Textbox(label="Log", lines=5)
 
             inspect_button.click(fn=do_inspect,inputs=[text_input],outputs=[inspect_result])
-            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[save_name,enable_overwrite],outputs=save_result)
+            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[save_name,enable_overwrite,step_box],outputs=save_result)
 
     return [(ui, "Embedding Inspector", "inspector")]
 
