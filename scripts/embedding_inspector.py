@@ -1,13 +1,12 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.5 - 2022.12.08
+# version 2.51 - 2022.12.12
 #
 
 import gradio as gr
 from modules import script_callbacks, shared, sd_hijack
 import torch, os
-from modules.sd_hijack_open_clip import tokenizer as open_clip_tokenizer
 from modules.textual_inversion.textual_inversion import Embedding
 
 MAX_NUM_MIX = 6 # number of embeddings that can be mixed
@@ -27,6 +26,7 @@ def get_data():
         internal_embs = embedder.transformer.text_model.embeddings.token_embedding.wrapped.weight
 
     elif embedder.__class__.__name__=='FrozenOpenCLIPEmbedder': # SD2.0 detected
+        from modules.sd_hijack_open_clip import tokenizer as open_clip_tokenizer
         tokenizer = open_clip_tokenizer
         internal_embs = embedder.model.token_embedding.wrapped.weight
 
