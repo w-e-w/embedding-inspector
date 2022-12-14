@@ -49,7 +49,7 @@ Stable Diffusion contains a database of ~49K words/tokens, and their numerical r
 
 New tokens/concepts can also be loaded from embeddings folder. They are usually created via textual inversion, or you can download some from [Stable Diffusion concepts library](https://huggingface.co/sd-concepts-library). With Embedding-inspector you can inspect and mix embeddings both from the internal database and the loaded database.
 
-#Eval feature
+# Eval feature
 
 Embeddings consist 768 or 1024 numbers, these numbers determine the generated image, but what each number controls is a mystery. With eval feature you can zero/modify some of these numbers to see what happens.
 
