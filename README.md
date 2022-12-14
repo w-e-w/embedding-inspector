@@ -1,4 +1,5 @@
-# Embedding-inspector extension version 2.5 - 2022.12.08
+# Embedding-inspector extension version 2.52 - 2022.12.14
+
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
 With this extension you can inspect internal/loaded embeddings and find out which embeddings are similar, and you can mix them to create new embeddings.
