@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.52 - 2022.12.14
+# version 2.53 - 2022.12.14
 #
 
 import gradio as gr
@@ -175,9 +175,8 @@ def do_save(*args):
     enable_overwrite = args[-2]
     step_text = args[-1].strip()
     concat_mode = args[-4]
-    global_mul =  args[-5]
-    eval_txt = args[-6].strip()
-    if save_name=='':return 'Filename is empty'
+    eval_txt = args[-5].strip()
+    if save_name=='':return 'Filename is empty', None
 
     results = []
 
@@ -185,7 +184,7 @@ def do_save(*args):
     file_exists = os.path.exists(save_filename)
     if (file_exists):
         if not(enable_overwrite):
-            return('File already exists, overwrite not enabled, aborting save.')
+            return('File already exists, overwrite not enabled, aborting save.', None)
         else:
             results.append('File already exists, overwrite is enabled')
 
@@ -234,13 +233,11 @@ def do_save(*args):
                 tot_vec = torch.cat([tot_vec,mix_vec*mixval])
             results.append('> '+emb_name+'('+str(emb_id)+')'+' x '+str(mixval))
 
+    saved_graph = None
     # save the mixed embedding
     if (tot_vec==None):
         results.append('No embeddings were mixed, nothing to save')
     else:
-        tot_vec = tot_vec*global_mul
-        if (global_mul!=1.0): results.append('x global multiplier '+str(global_mul))
-
         #eval feautre
         if eval_txt!='':
             vec = tot_vec
@@ -273,6 +270,7 @@ def do_save(*args):
         try:
             new_emb.save(save_filename)
             results.append('Saved "'+save_filename+'"')
+
         except:
             results.append('Error saving "'+save_filename+'" (filename might be invalid)')
 
@@ -280,7 +278,18 @@ def do_save(*args):
         sd_hijack.model_hijack.embedding_db.dir_mtime=0
         sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings()
 
-    return '\n'.join(results)  # return info string to log textbox
+        # save graph
+        try:
+            from matplotlib import pyplot as plt
+            fig = plt.figure()
+            for u in range(tot_vec.shape[0]):
+                x = torch.arange(start=0,end=tot_vec[u].shape[0],step=1)
+                plt.plot(x.numpy(), tot_vec[u].numpy())
+            saved_graph = fig
+        except:
+            saved_graph = None
+
+    return '\n'.join(results), saved_graph  # return info string to log textbox and saved_graph
 
 #-------------------------------------------------------------------------------
 
@@ -372,9 +381,8 @@ def add_tab():
 
                     with gr.Row():
                             concat_mode = gr.Checkbox(value=False,label="Concat mode")
-                            global_mul = gr.Slider(label="Global Multiplier",value=1.0,minimum=-10.0, maximum=10.0, step=1.0)
-                            step_box = gr.Textbox(label="Step",lines=1,placeholder='only for training')
                             eval_box =  gr.Textbox(label="Eval",lines=1,placeholder='torch.relu(v)')
+                            step_box = gr.Textbox(label="Step",lines=1,placeholder='only for training')
 
                     with gr.Row():
                         save_name = gr.Textbox(label="Filename",lines=1,placeholder='Enter file name to save')
@@ -382,11 +390,12 @@ def add_tab():
                         enable_overwrite = gr.Checkbox(value=False,label="Enable overwrite")
 
                     with gr.Row():
-                        save_result = gr.Textbox(label="Log", lines=5)
+                        save_result = gr.Textbox(label="Log", lines=10)
+                        save_graph = gr.Plot()
 
             listloaded_button.click(fn=do_listloaded, outputs=inspect_result)
             inspect_button.click(fn=do_inspect,inputs=[text_input],outputs=[inspect_result])
-            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[eval_box, global_mul, concat_mode,save_name,enable_overwrite,step_box],outputs=save_result)
+            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[eval_box, concat_mode,save_name,enable_overwrite,step_box],outputs=[save_result, save_graph])
 
             mini_tokenize.click(fn=do_minitokenize,inputs=mix_inputs+[concat_mode, mini_sendtomix, mini_input], outputs=mix_inputs+[concat_mode,mini_result])
 
