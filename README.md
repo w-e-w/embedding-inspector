@@ -51,7 +51,7 @@ New tokens/concepts can also be loaded from embeddings folder. They are usually 
 
 # Eval feature
 
-Embeddings consist 768 or 1024 numbers, these numbers determine the generated image, but what each number controls is a mystery. With eval feature you can zero/modify some of these numbers to see what happens.
+Embeddings consist of 768 or 1024 numbers, these numbers determine the generated image, but what each number controls is a mystery. With eval feature you can zero/modify some of these numbers to see what happens.
 
 Enter an embedding name like "cat" in "Name 0" box, type a filename like "evaltest" and check "enable overwrite", enter the eval string in "Eval" box, click "save mixed".  You can check log for errors, and also inspect "evaltest" to see that the values have changed. Then generate the image in txt2img tab with the prompt "evaltest" to see the effect.
 
