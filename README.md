@@ -19,7 +19,7 @@ v2.4: Added "Concat mode" option. In this mode, embeddings will be just combined
 
 v2.5 Added "global multiplier" option, which is useful to adjust strength in concat mode. Added a mini tokenizer. You can select "Send IDs to mixer" option to automate converting a short prompt to an embedding.
 
-v.252 Added an experimental eval feautre. Text entered in Eval box will be evaluated and applied to the saved embedding. Not exactly useful, but see bottom of this page for usage.
+v2.52 Added an experimental eval feature. Text entered in Eval box will be evaluated and applied to the saved embedding. Not exactly useful, but see bottom of this page for usage.
 
 # Manual Installation
 
