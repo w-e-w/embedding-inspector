@@ -1,13 +1,14 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.51 - 2022.12.12
+# version 2.52 - 2022.12.14
 #
 
 import gradio as gr
 from modules import script_callbacks, shared, sd_hijack
 import torch, os
 from modules.textual_inversion.textual_inversion import Embedding
+import math
 
 MAX_NUM_MIX = 6 # number of embeddings that can be mixed
 MAX_SIMILAR_EMBS = 30 # number of similar embeddings to show
@@ -175,6 +176,7 @@ def do_save(*args):
     step_text = args[-1].strip()
     concat_mode = args[-4]
     global_mul =  args[-5]
+    eval_txt = args[-6].strip()
     if save_name=='':return 'Filename is empty'
 
     results = []
@@ -238,6 +240,30 @@ def do_save(*args):
     else:
         tot_vec = tot_vec*global_mul
         if (global_mul!=1.0): results.append('x global multiplier '+str(global_mul))
+
+        #eval feautre
+        if eval_txt!='':
+            vec = tot_vec
+            try:
+                maxn = vec.shape[0]
+                maxi = vec.shape[1]
+                for n in range(maxn):
+                    if eval_txt.startswith('='):
+                        #item-wise eval
+                        for i in range(maxi):
+                            v = vec[n,i]
+                            ve = eval(eval_txt[1:]) #strip "="
+                            vec[n,i] = ve
+                    else:
+                        #tensor-wise eval
+                        v = vec[n]
+                        ve = eval(eval_txt)
+                        vec[n] = ve
+                tot_vec = vec
+                results.append('Applied eval: "'+eval_txt+'"')
+            except Exception as e:
+                results.append('Error evaluating: "'+eval_txt+'" - '+str(e))
+
 
         new_emb = Embedding(tot_vec, save_name)
         if (step_val!=None):
@@ -348,6 +374,7 @@ def add_tab():
                             concat_mode = gr.Checkbox(value=False,label="Concat mode")
                             global_mul = gr.Slider(label="Global Multiplier",value=1.0,minimum=-10.0, maximum=10.0, step=1.0)
                             step_box = gr.Textbox(label="Step",lines=1,placeholder='only for training')
+                            eval_box =  gr.Textbox(label="Eval",lines=1,placeholder='torch.relu(v)')
 
                     with gr.Row():
                         save_name = gr.Textbox(label="Filename",lines=1,placeholder='Enter file name to save')
@@ -359,7 +386,7 @@ def add_tab():
 
             listloaded_button.click(fn=do_listloaded, outputs=inspect_result)
             inspect_button.click(fn=do_inspect,inputs=[text_input],outputs=[inspect_result])
-            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[global_mul, concat_mode,save_name,enable_overwrite,step_box],outputs=save_result)
+            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[eval_box, global_mul, concat_mode,save_name,enable_overwrite,step_box],outputs=save_result)
 
             mini_tokenize.click(fn=do_minitokenize,inputs=mix_inputs+[concat_mode, mini_sendtomix, mini_input], outputs=mix_inputs+[concat_mode,mini_result])
 
