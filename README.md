@@ -74,15 +74,15 @@ Eval " = torch.ceil(v)" rounds all values
 
 If the Eval string starts with "=", evaluation will be done item-wise. Here available variables are : v=original value, i=item no (0:768 or 0:1024), maxi=item count (768 or 1024), n=vector no, maxn=vector count
 
-Eval " = v*(i<100)" zeroes items after 100th
+Eval " = v * (i<100)" zeroes items after 100th
 
-Eval " = v*(i<maxi//2)" zeroes items in the upper half.
+Eval " = v * (i<maxi//2)" zeroes items in the upper half.
 
-Eval " = v*(i>100 and i<200)" zeroes all items except between 100th and 200th.
+Eval " = v * (i>100 and i<200)" zeroes all items except between 100th and 200th.
 
-Eval " = v*(i<400 or i>500)" zeroes all items between 400th and 500th.
+Eval " = v * (i<400 or i>500)" zeroes all items between 400th and 500th.
 
-Eval " = v*(i<300)*(n==0) + v*(i>300)*(n==1)" zeroes different parts of vectors 0 and 1 (in concat mode, see screenshot below)
+Eval " = v * (i<300) * (n==0) + v * (i>300) * (n==1)" zeroes different parts of vectors 0 and 1 (in concat mode, see screenshot below)
 
 ![image](screenshot8.jpg)
 ![image](00000-2687304813-evaltest.jpg)
