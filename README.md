@@ -1,4 +1,4 @@
-# Embedding-inspector extension version 2.52 - 2022.12.14
+# Embedding-inspector extension version 2.53 - 2022.12.14
 
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
@@ -18,9 +18,11 @@ v2.3: Added "List loaded embeddings" button
 
 v2.4: Added "Concat mode" option. In this mode, embeddings will be just combined instead of being mixed. For example, "mona" and "lisa" can be combined into a single embedding "monalisa" which will contain 2 vectors, and the result will be the same as having "mona lisa" in the prompt, but with a single keyword.
 
-v2.5 Added "global multiplier" option, which is useful to adjust strength in concat mode. Added a mini tokenizer. You can select "Send IDs to mixer" option to automate converting a short prompt to an embedding.
+v2.5 Added a mini tokenizer. You can select "Send IDs to mixer" option to automate converting a short prompt to an embedding.
 
 v2.52 Added an experimental eval feature. Text entered in Eval box will be evaluated and applied to the saved embedding. Not exactly useful, but see bottom of this page for usage.
+
+v2.53 Added graph for saved embedding.
 
 # Manual Installation
 
@@ -60,6 +62,8 @@ In the Eval string, use v as the original vector. Torch and math functions are a
 
 Examples:
 
+Eval "v*2" multiplies by 2, increasing the strength of the embedding
+
 Eval "v-torch.min(v)" shifts all numbers up to the positive range, seems to have no effect.
 
 Eval "torch.relu(v)" zeroes all negative numbers.
@@ -68,7 +72,7 @@ Eval "torch.abs(v)" makes all values positive.
 
 Eval " = torch.ceil(v)" rounds all values
 
-If the Eval string starts with "=", evaluation will be done item-wise. Here available variables are : v=original value, i=item no (0:768 or 0:1024), maxi=item count (768 or 1024)
+If the Eval string starts with "=", evaluation will be done item-wise. Here available variables are : v=original value, i=item no (0:768 or 0:1024), maxi=item count (768 or 1024), n=vector no, maxn=vector count
 
 Eval " = v*(i<100)" zeroes items after 100th
 
@@ -77,3 +81,8 @@ Eval " = v*(i<maxi//2)" zeroes items in the upper half.
 Eval " = v*(i>100 and i<200)" zeroes all items except between 100th and 200th.
 
 Eval " = v*(i<400 or i>500)" zeroes all items between 400th and 500th.
+
+Eval " = v*(i<300)*(n==0) + v*(i>300)*(n==1)" zeroes different parts of vectors 0 and 1 (in concat mode, see screenshot below)
+
+![image](screenshot8.jpg)
+![image](00000-2687304813-evaltest.jpg)
