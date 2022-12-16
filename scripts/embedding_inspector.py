@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.53 - 2022.12.14
+# version 2.531 - 2022.12.17
 #
 
 import gradio as gr
@@ -14,6 +14,8 @@ MAX_NUM_MIX = 6 # number of embeddings that can be mixed
 MAX_SIMILAR_EMBS = 30 # number of similar embeddings to show
 VEC_SHOW_TRESHOLD = 1 # formatting for printing tensors
 SEP_STR = '-'*80 # separator string
+
+ENABLE_GRAPH = False
 
 #-------------------------------------------------------------------------------
 
@@ -240,7 +242,7 @@ def do_save(*args):
     else:
         #eval feautre
         if eval_txt!='':
-            vec = tot_vec
+            vec = tot_vec.clone()
             try:
                 maxn = vec.shape[0]
                 maxi = vec.shape[1]
@@ -278,16 +280,18 @@ def do_save(*args):
         sd_hijack.model_hijack.embedding_db.dir_mtime=0
         sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings()
 
-        # save graph
-        try:
-            from matplotlib import pyplot as plt
-            fig = plt.figure()
-            for u in range(tot_vec.shape[0]):
-                x = torch.arange(start=0,end=tot_vec[u].shape[0],step=1)
-                plt.plot(x.numpy(), tot_vec[u].numpy())
-            saved_graph = fig
-        except:
-            saved_graph = None
+
+        if ENABLE_GRAPH:
+            # save graph
+            try:
+                from matplotlib import pyplot as plt
+                fig = plt.figure()
+                for u in range(tot_vec.shape[0]):
+                    x = torch.arange(start=0,end=tot_vec[u].shape[0],step=1)
+                    plt.plot(x.numpy(), tot_vec[u].numpy())
+                saved_graph = fig
+            except:
+                saved_graph = None
 
     return '\n'.join(results), saved_graph  # return info string to log textbox and saved_graph
 
@@ -381,7 +385,7 @@ def add_tab():
 
                     with gr.Row():
                             concat_mode = gr.Checkbox(value=False,label="Concat mode")
-                            eval_box =  gr.Textbox(label="Eval",lines=1,placeholder='torch.relu(v)')
+                            eval_box =  gr.Textbox(label="Eval",lines=1,placeholder='=v+torch.rand(1)*0.1')
                             step_box = gr.Textbox(label="Step",lines=1,placeholder='only for training')
 
                     with gr.Row():
