@@ -1,4 +1,4 @@
-# Embedding-inspector extension version 2.53 - 2022.12.14
+# Embedding-inspector extension version 2.531 - 2022.12.17
 
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
@@ -22,7 +22,7 @@ v2.5 Added a mini tokenizer. You can select "Send IDs to mixer" option to automa
 
 v2.52 Added an experimental eval feature. Text entered in Eval box will be evaluated and applied to the saved embedding. Not exactly useful, but see bottom of this page for usage.
 
-v2.53 Added graph for saved embedding.
+v2.53 Added graph for saved embedding. (temporarily disabled in v2.531)
 
 # Manual Installation
 
