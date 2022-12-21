@@ -30,8 +30,8 @@ Added "combine as 1-vector" option. This option sums the final vectors into one 
 
 Another case is to combine different parts of two embeddings as one, for which you can use an eval string like "=v* (n==0) * (i<300)+v * (n==1) * (i>=300)"
 
-![image](screenshot9.jpg)
-![image](00007-563623717-catdog.jpeg)
+![image](screenshots/screenshot9.jpg)
+![image](screenshots/00007-563623717-catdog.jpeg)
 
 # Manual Installation
 
@@ -41,19 +41,19 @@ Download ![embedding-inspector-main.zip](https://github.com/tkalayci71/embedding
 
 1) Enter a token name into "Text Input" box and click "Inspect" button. Only the first token found in the text input will be processed. Below, some information about the token will be displayed, and similar embeddings will be listed in the order of their similarity. This is useful to check if a word is in the token database, find internal tokens that are similar to loaded embeddings, and also to discover related unicode emojis.
 
-![image](screenshot1.jpg)
-![image](screenshot4.jpg)
+![image](screenshots/screenshot1.jpg)
+![image](screenshots/screenshot4.jpg)
 
 2) Enter one or more token names in the "Name 0", "Name 1"... boxes, adjust their weights with "Multiplier" sliders, enter a unique name in "Filename" box, click "Save mixed" button. This will create a new embedding (mixed from the given embeddings and weights) and save it in the embeddings folder. If the file already exists, "Enable overwrite" box must be checked to allow overwriting it. Then, you use the filename as a keyword in your prompt.
 
-![image](screenshot2.jpg)
-![image](screenshot3.jpg)
+![image](screenshots/screenshot2.jpg)
+![image](screenshots/screenshot3.jpg)
 
 3) Enter a short prompt in mini tokenizer text box, select "Send IDs to mixer" option, click "Tokenize". In the mixer section IDs will have been copied and "Concat mode" checked. Adjust multiplier and global multiplier sliders if necessary, enter a filename and click "Save mixed" button. Then use the filename as a keyword in your prompt.
 
-![image](screenshot5.jpg)
-![image](screenshot6.jpg)
-![image](screenshot7.jpg)
+![image](screenshots/screenshot5.jpg)
+![image](screenshots/screenshot6.jpg)
+![image](screenshots/screenshot7.jpg)
 
 # Background information
 
@@ -93,5 +93,5 @@ Eval " = v * (i<400 or i>500)" zeroes all items between 400th and 500th.
 
 Eval " = v * (i<300) * (n==0) + v * (i>300) * (n==1)" zeroes different parts of vectors 0 and 1 (in concat mode, see screenshot below)
 
-![image](screenshot8.jpg)
-![image](00000-2687304813-evaltest.jpg)
+![image](screenshots/screenshot8.jpg)
+![image](screenshots/00000-2687304813-evaltest.jpg)
