@@ -30,7 +30,7 @@ Added "combine as 1-vector" option. This option sums the final vectors into one 
 
 Another case is to combine different parts of two embeddings as one, for which you can use an eval string like "=v* (n==0) * (i<300)+v * (n==1) * (i>=300)"
 
-![image](screenshot8.jpg)
+![image](screenshot9.jpg)
 ![image](00007-563623717-catdog.jpeg)
 
 # Manual Installation
