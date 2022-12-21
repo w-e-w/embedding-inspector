@@ -1,14 +1,14 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.531 - 2022.12.17
+# version 2.532 - 2022.12.21
 #
 
 import gradio as gr
 from modules import script_callbacks, shared, sd_hijack
 import torch, os
 from modules.textual_inversion.textual_inversion import Embedding
-import math
+import math, random
 
 MAX_NUM_MIX = 6 # number of embeddings that can be mixed
 MAX_SIMILAR_EMBS = 30 # number of similar embeddings to show
@@ -145,6 +145,9 @@ def do_inspect(text):
         # add tensor values to results
         torch.set_printoptions(threshold=VEC_SHOW_TRESHOLD,profile='default')
         results.append('Vector['+str(v)+'] = '+str(vec_v))
+        results.append('Magnitude: '+str(torch.linalg.norm(vec_v).item()))
+        results.append('Min, Max: '+str(torch.min(vec_v).item())+', '+str(torch.max(vec_v).item()))
+
 
         # calculate similar embeddings and add to results
         if vec_v.shape[0]!=internal_embs.shape[1]:
@@ -178,6 +181,7 @@ def do_save(*args):
     step_text = args[-1].strip()
     concat_mode = args[-4]
     eval_txt = args[-5].strip()
+    combine_mode = args[-6]
     if save_name=='':return 'Filename is empty', None
 
     results = []
@@ -263,6 +267,9 @@ def do_save(*args):
             except Exception as e:
                 results.append('Error evaluating: "'+eval_txt+'" - '+str(e))
 
+        if (combine_mode and (tot_vec.shape[0]>1)):
+            results.append('combining '+str(tot_vec.shape[0])+' vectors as 1-vector')
+            tot_vec = torch.sum(tot_vec,dim=0,keepdim=True)
 
         new_emb = Embedding(tot_vec, save_name)
         if (step_val!=None):
@@ -330,6 +337,7 @@ def do_minitokenize(*args):
     mini_input=args[-1].strip()
     mini_sendtomix = args[-2]
     concat_mode = args[-3]
+    combine_mode = args[-4]
     mix_inputs = args[0:MAX_NUM_MIX]
 
     tokenizer, internal_embs, loaded_embs = get_data()
@@ -350,7 +358,9 @@ def do_minitokenize(*args):
         for i in range(MAX_NUM_MIX):
             if (i>=len(found_ids)): mix_inputs_list[i]=''
 
-    return *mix_inputs_list,concat_mode,' '.join(results)# return everything
+    combine_mode = False
+
+    return *mix_inputs_list,concat_mode,combine_mode,' '.join(results)# return everything
 
 #-------------------------------------------------------------------------------
 
@@ -384,8 +394,10 @@ def add_tab():
                                mix_sliders.append(gr.Slider(label="Multiplier",value=1.0,minimum=-1.0, maximum=1.0, step=0.1))
 
                     with gr.Row():
-                            concat_mode = gr.Checkbox(value=False,label="Concat mode")
-                            eval_box =  gr.Textbox(label="Eval",lines=1,placeholder='=v+torch.rand(1)*0.1')
+                            with gr.Column():
+                                concat_mode = gr.Checkbox(value=False,label="Concat mode")
+                                combine_mode =  gr.Checkbox(value=False,label="combine as 1-vector")
+                            eval_box =  gr.Textbox(label="Eval",lines=2,placeholder='=v+torch.rand(1)*0.1')
                             step_box = gr.Textbox(label="Step",lines=1,placeholder='only for training')
 
                     with gr.Row():
@@ -399,9 +411,9 @@ def add_tab():
 
             listloaded_button.click(fn=do_listloaded, outputs=inspect_result)
             inspect_button.click(fn=do_inspect,inputs=[text_input],outputs=[inspect_result])
-            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[eval_box, concat_mode,save_name,enable_overwrite,step_box],outputs=[save_result, save_graph])
+            save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[combine_mode, eval_box, concat_mode,save_name,enable_overwrite,step_box],outputs=[save_result, save_graph])
 
-            mini_tokenize.click(fn=do_minitokenize,inputs=mix_inputs+[concat_mode, mini_sendtomix, mini_input], outputs=mix_inputs+[concat_mode,mini_result])
+            mini_tokenize.click(fn=do_minitokenize,inputs=mix_inputs+[combine_mode, concat_mode, mini_sendtomix, mini_input], outputs=mix_inputs+[concat_mode,combine_mode, mini_result])
 
     return [(ui, "Embedding Inspector", "inspector")]
 
