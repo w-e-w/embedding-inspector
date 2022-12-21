@@ -28,7 +28,7 @@ v2.532 Added  magnitude, min, max to displayed embedding info. Not much use but 
 
 Added "combine as 1-vector" option. This option sums the final vectors into one vector, makes sense when used with eval feature. For example, to extract one of the vectors of a multi-vector embedding, you can use "=v*(n==2)" which zeroes all vectors but vector#2
 
-Another case is to combine different parts of two embeddings as one, for which you can use an eval string like "=v*(n==0)*(i<300)+v*(n==1)*(i>=300)"
+Another case is to combine different parts of two embeddings as one, for which you can use an eval string like "=v* (n==0) * (i<300)+v * (n==1) * (i>=300)"
 
 ![image](screenshot8.jpg)
 ![image](00007-563623717-catdog.jpeg)
