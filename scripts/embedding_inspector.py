@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.532 - 2022.12.21
+# version 2.533 - 2022.12.23
 #
 
 import gradio as gr
@@ -364,6 +364,15 @@ def do_minitokenize(*args):
 
 #-------------------------------------------------------------------------------
 
+def do_reset(*args):
+
+    mix_inputs_list = [''] * MAX_NUM_MIX
+    mix_slider_list = [1.0] * MAX_NUM_MIX
+
+    return *mix_inputs_list, *mix_slider_list
+
+#-------------------------------------------------------------------------------
+
 def add_tab():
     with gr.Blocks(analytics_enabled=False) as ui:
         with gr.Tabs():
@@ -384,6 +393,10 @@ def add_tab():
                         mini_result = gr.Textbox(label="Tokens", lines=1)
 
                 with gr.Column(variant='panel'):
+                    with gr.Row():
+                        gr.Column(variant='panel')
+                        reset_button = gr.Button(value="Reset mixer")
+
                     mix_inputs = []
                     mix_sliders = []
                     for n in range(MAX_NUM_MIX):
@@ -414,6 +427,8 @@ def add_tab():
             save_button.click(fn=do_save, inputs=mix_inputs+mix_sliders+[combine_mode, eval_box, concat_mode,save_name,enable_overwrite,step_box],outputs=[save_result, save_graph])
 
             mini_tokenize.click(fn=do_minitokenize,inputs=mix_inputs+[combine_mode, concat_mode, mini_sendtomix, mini_input], outputs=mix_inputs+[concat_mode,combine_mode, mini_result])
+
+            reset_button.click(fn=do_reset,outputs=mix_inputs+mix_sliders)
 
     return [(ui, "Embedding Inspector", "inspector")]
 
