@@ -1,4 +1,4 @@
-# Embedding-inspector extension version 2.532 - 2022.12.21
+# Embedding-inspector extension version 2.533 - 2022.12.23
 
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
@@ -32,6 +32,8 @@ Another case is to combine different parts of two embeddings as one, for which y
 
 ![image](screenshots/screenshot9.jpg)
 ![image](screenshots/00007-563623717-catdog.jpeg)
+
+v2.532 Added "reset mixer" button
 
 # Manual Installation
 
