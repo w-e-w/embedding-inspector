@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.533 - 2022.12.23
+# version 2.54 - 2022.12.29
 #
 
 import gradio as gr
@@ -12,10 +12,12 @@ import math, random
 
 MAX_NUM_MIX = 6 # number of embeddings that can be mixed
 MAX_SIMILAR_EMBS = 30 # number of similar embeddings to show
-VEC_SHOW_TRESHOLD = 1 # formatting for printing tensors
+VEC_SHOW_TRESHOLD = 1 # change to 10000 to see all values
+VEC_SHOW_PROFILE = 'default' #change to 'full' for more precision
 SEP_STR = '-'*80 # separator string
 
 ENABLE_GRAPH = False
+ENABLE_SHOW_CHECKSUM = False #slows down listing loaded embeddings
 
 #-------------------------------------------------------------------------------
 
@@ -42,6 +44,8 @@ def get_data():
 #-------------------------------------------------------------------------------
 
 def text_to_emb_ids(text, tokenizer):
+
+    text = text.lower()
 
     if tokenizer.__class__.__name__== 'CLIPTokenizer': # SD1.x detected
         emb_ids = tokenizer(text, truncation=False, add_special_tokens=False)["input_ids"]
@@ -72,9 +76,18 @@ def emb_id_to_name(emb_id, tokenizer):
 
 def get_embedding_info(text):
 
+    text = text.lower()
+
     tokenizer, internal_embs, loaded_embs = get_data()
 
     loaded_emb = loaded_embs.get(text, None)
+
+    if loaded_emb == None:
+        for k in loaded_embs.keys():
+            if text == k.lower():
+                loaded_emb = loaded_embs.get(k, None)
+                break
+
     if loaded_emb!=None:
         emb_name = loaded_emb.name
         emb_id = '['+loaded_emb.checksum()+']' # emb_id is string for loaded embeddings
@@ -107,7 +120,7 @@ def get_embedding_info(text):
 
 def do_inspect(text):
 
-    text = text.strip()
+    text = text.strip().lower()
     if (text==''): return 'Need embedding name or embedding ID as #nnnnn'
 
     # get the embedding info for first token in text
@@ -138,12 +151,21 @@ def do_inspect(text):
     # add all vector infos to results
     tokenizer, internal_embs, loaded_embs = get_data()
     all_embs = internal_embs.to(device='cpu',dtype=torch.float32)# all internal embeddings copied to cpu as float32
+
+    torch.set_printoptions(threshold=VEC_SHOW_TRESHOLD,profile=VEC_SHOW_PROFILE)
+
+    """
+    with open('emb_vec.txt', 'w') as f:
+        f.write(str(emb_vec))
+        f.close()
+    """
+
     for v in range(vec_count):
 
         vec_v = emb_vec[v].to(device='cpu',dtype=torch.float32)
 
         # add tensor values to results
-        torch.set_printoptions(threshold=VEC_SHOW_TRESHOLD,profile='default')
+
         results.append('Vector['+str(v)+'] = '+str(vec_v))
         results.append('Magnitude: '+str(torch.linalg.norm(vec_v).item()))
         results.append('Min, Max: '+str(torch.min(vec_v).item())+', '+str(torch.max(vec_v).item()))
@@ -205,7 +227,8 @@ def do_save(*args):
     vec_size = None
     tot_vec = None
     for k in range(MAX_NUM_MIX):
-        name= args[k].strip()
+        name= args[k].strip().lower()
+
         mixval = args[k+MAX_NUM_MIX]
         if (name=='') or (mixval==0): continue
 
@@ -319,7 +342,8 @@ def do_listloaded():
 
             r = []
             r.append(str(emb.name))
-            r.append('    ['+str(emb.checksum())+']')
+            if ENABLE_SHOW_CHECKSUM:
+                r.append('    ['+str(emb.checksum())+']')
             r.append('    Vectors: '+str(emb.vec.shape[0])+' x ' +str(emb.vec.shape[1]))
             if (emb.sd_checkpoint_name!=None): r.append('    Ckpt:'+str(emb.sd_checkpoint_name))
             results.append(''.join(r))
@@ -334,7 +358,8 @@ def do_listloaded():
 
 def do_minitokenize(*args):
 
-    mini_input=args[-1].strip()
+    mini_input=args[-1].strip().lower()
+
     mini_sendtomix = args[-2]
     concat_mode = args[-3]
     combine_mode = args[-4]
