@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.55 - 2022.12.29
+# version 2.56 - 2022.12.30
 #
 
 import gradio as gr
@@ -16,7 +16,7 @@ VEC_SHOW_TRESHOLD = 1 # change to 10000 to see all values
 VEC_SHOW_PROFILE = 'default' #change to 'full' for more precision
 SEP_STR = '-'*80 # separator string
 
-ENABLE_GRAPH = False
+ENABLE_GRAPH = True
 ENABLE_SHOW_CHECKSUM = False #slows down listing loaded embeddings
 REMOVE_ZEROED_VECTORS = True #optional
 
@@ -324,16 +324,28 @@ def do_save(*args):
                 # save graph
                 try:
                     from matplotlib import pyplot as plt
+
                     fig = plt.figure()
                     for u in range(tot_vec.shape[0]):
                         x = torch.arange(start=0,end=tot_vec[u].shape[0],step=1)
                         plt.plot(x.numpy(), tot_vec[u].numpy())
-                    saved_graph = fig
+
+                    saved_graph = fig2img(fig)
                 except:
                     saved_graph = None
 
     return '\n'.join(results), saved_graph  # return info string to log textbox and saved_graph
 
+def fig2img(fig):
+    import io
+    from PIL import Image
+    buf = io.BytesIO()
+    fig.savefig(buf)
+    buf.seek(0)
+    img = Image.open(buf)
+    img.load()
+    buf.close()
+    return img
 #-------------------------------------------------------------------------------
 
 def do_listloaded():
@@ -383,7 +395,9 @@ def do_minitokenize(*args):
     found_ids = text_to_emb_ids(mini_input, tokenizer)
     for i in range(len(found_ids)):
         idstr = '#'+str(found_ids[i])
-        results.append(idstr)
+
+        embstr = emb_id_to_name(found_ids[i],tokenizer)
+        results.append(embstr+' '+idstr+'  ')
         if (mini_sendtomix==True):
             if (i<MAX_NUM_MIX): mix_inputs_list[i]=idstr
 
@@ -444,7 +458,7 @@ def add_tab():
                             with gr.Column():
                                 concat_mode = gr.Checkbox(value=False,label="Concat mode")
                                 combine_mode =  gr.Checkbox(value=False,label="combine as 1-vector")
-                            eval_box =  gr.Textbox(label="Eval",lines=2,placeholder='=v+torch.rand(1)*0.1')
+                            eval_box =  gr.Textbox(label="Eval",lines=2,placeholder='=v*2')
                             step_box = gr.Textbox(label="Step",lines=1,placeholder='only for training')
 
                     with gr.Row():
@@ -454,7 +468,7 @@ def add_tab():
 
                     with gr.Row():
                         save_result = gr.Textbox(label="Log", lines=10)
-                        save_graph = gr.Plot()
+                        save_graph = gr.Image()
 
             listloaded_button.click(fn=do_listloaded, outputs=inspect_result)
             inspect_button.click(fn=do_inspect,inputs=[text_input],outputs=[inspect_result])
