@@ -1,4 +1,4 @@
-# Embedding-inspector extension version 2.55 - 2022.12.29
+# Embedding-inspector extension version 2.56 - 2022.12.30
 
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
@@ -24,20 +24,15 @@ v2.52 Added an experimental eval feature. Text entered in Eval box will be evalu
 
 v2.53 Added graph for saved embedding. (temporarily disabled in v2.531)
 
-v2.532 Added  magnitude, min, max to displayed embedding info. Not much use but most internal embeddings seem to have around 0.3-0.4 magnitude.
-
-Added "combine as 1-vector" option. This option sums the final vectors into one vector, makes sense when used with eval feature. For example, to extract one of the vectors of a multi-vector embedding, you can use "=v*(n==2)" which zeroes all vectors but vector#2
-
-Another case is to combine different parts of two embeddings as one, for which you can use an eval string like "=v* (n==0) * (i<300)+v * (n==1) * (i>=300)"
-
-![image](screenshots/screenshot9.jpg)
-![image](screenshots/00007-563623717-catdog.jpeg)
+v2.532 Added  magnitude, min, max to displayed embedding info. Not much use but most internal embeddings seem to have around 0.3-0.4 magnitude. Added "combine as 1-vector" option. See bottom of this page for details.
 
 v2.533 Added "reset mixer" button
 
 v2.54 Bugfix for upper-case embedding names. Also disabled showing checksum when listing loaded embeddings
 
 v2.55 Remove zeroed vectors (as an option in the script REMOVE_ZEROED_VECTORS = True)
+
+v2.56 Showing graph of saved embedding is now enabled
 
 # Manual Installation
 
@@ -101,3 +96,12 @@ Eval " = v * (i<300) * (n==0) + v * (i>300) * (n==1)" zeroes different parts of 
 
 ![image](screenshots/screenshot8.jpg)
 ![image](screenshots/00000-2687304813-evaltest.jpg)
+
+# Combine as 1-vector option
+
+This option sums the final vectors into one vector, makes sense when used with eval feature. For example, to extract one of the vectors of a multi-vector embedding, you can use "=v*(n==2)" which zeroes all vectors but vector#2
+
+Another case is to combine different parts of two embeddings as one, for which you can use an eval string like "=v* (n==0) * (i<300)+v * (n==1) * (i>=300)"
+
+![image](screenshots/screenshot9.jpg)
+![image](screenshots/00007-563623717-catdog.jpeg)
