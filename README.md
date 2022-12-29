@@ -34,6 +34,7 @@ Another case is to combine different parts of two embeddings as one, for which y
 ![image](screenshots/00007-563623717-catdog.jpeg)
 
 v2.533 Added "reset mixer" button
+
 v2.54 Bugfix for upper-case embedding names. Also disabled showing checksum when listing loaded embeddings
 
 # Manual Installation
