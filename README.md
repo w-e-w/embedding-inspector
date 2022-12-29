@@ -1,4 +1,4 @@
-# Embedding-inspector extension version 2.533 - 2022.12.23
+# Embedding-inspector extension version 2.54 - 2022.12.29
 
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
@@ -33,7 +33,8 @@ Another case is to combine different parts of two embeddings as one, for which y
 ![image](screenshots/screenshot9.jpg)
 ![image](screenshots/00007-563623717-catdog.jpeg)
 
-v2.532 Added "reset mixer" button
+v2.533 Added "reset mixer" button
+v2.54 Bugfix for upper-case embedding names. Also disabled showing checksum when listing loaded embeddings
 
 # Manual Installation
 
