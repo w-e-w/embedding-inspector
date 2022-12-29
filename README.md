@@ -1,4 +1,4 @@
-# Embedding-inspector extension version 2.54 - 2022.12.29
+# Embedding-inspector extension version 2.55 - 2022.12.29
 
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
@@ -36,6 +36,8 @@ Another case is to combine different parts of two embeddings as one, for which y
 v2.533 Added "reset mixer" button
 
 v2.54 Bugfix for upper-case embedding names. Also disabled showing checksum when listing loaded embeddings
+
+v2.55 Remove zeroed vectors (as an option in the script REMOVE_ZEROED_VECTORS = True)
 
 # Manual Installation
 
