@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.54 - 2022.12.29
+# version 2.55 - 2022.12.29
 #
 
 import gradio as gr
@@ -18,6 +18,7 @@ SEP_STR = '-'*80 # separator string
 
 ENABLE_GRAPH = False
 ENABLE_SHOW_CHECKSUM = False #slows down listing loaded embeddings
+REMOVE_ZEROED_VECTORS = True #optional
 
 #-------------------------------------------------------------------------------
 
@@ -294,34 +295,42 @@ def do_save(*args):
             results.append('combining '+str(tot_vec.shape[0])+' vectors as 1-vector')
             tot_vec = torch.sum(tot_vec,dim=0,keepdim=True)
 
-        new_emb = Embedding(tot_vec, save_name)
-        if (step_val!=None):
-            new_emb.step = step_val
-            results.append('Setting step value to '+str(step_val))
 
-        try:
-            new_emb.save(save_filename)
-            results.append('Saved "'+save_filename+'"')
+        if REMOVE_ZEROED_VECTORS:
+            old_count = tot_vec.shape[0]
+            tot_vec = tot_vec[torch.count_nonzero(tot_vec,dim=1)>0]
+            new_count = tot_vec.shape[0]
+            if (old_count!=new_count): results.append('Removed '+str(old_count-new_count)+' zeroed vectors, remaining vectors: '+str(new_count))
 
-        except:
-            results.append('Error saving "'+save_filename+'" (filename might be invalid)')
+        if tot_vec.shape[0]>0:
+            new_emb = Embedding(tot_vec, save_name)
+            if (step_val!=None):
+                new_emb.step = step_val
+                results.append('Setting step value to '+str(step_val))
 
-        results.append('Reloading all embeddings')
-        sd_hijack.model_hijack.embedding_db.dir_mtime=0
-        sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings()
-
-
-        if ENABLE_GRAPH:
-            # save graph
             try:
-                from matplotlib import pyplot as plt
-                fig = plt.figure()
-                for u in range(tot_vec.shape[0]):
-                    x = torch.arange(start=0,end=tot_vec[u].shape[0],step=1)
-                    plt.plot(x.numpy(), tot_vec[u].numpy())
-                saved_graph = fig
+                new_emb.save(save_filename)
+                results.append('Saved "'+save_filename+'"')
+
             except:
-                saved_graph = None
+                results.append('Error saving "'+save_filename+'" (filename might be invalid)')
+
+            results.append('Reloading all embeddings')
+            sd_hijack.model_hijack.embedding_db.dir_mtime=0
+            sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings()
+
+
+            if ENABLE_GRAPH:
+                # save graph
+                try:
+                    from matplotlib import pyplot as plt
+                    fig = plt.figure()
+                    for u in range(tot_vec.shape[0]):
+                        x = torch.arange(start=0,end=tot_vec[u].shape[0],step=1)
+                        plt.plot(x.numpy(), tot_vec[u].numpy())
+                    saved_graph = fig
+                except:
+                    saved_graph = None
 
     return '\n'.join(results), saved_graph  # return info string to log textbox and saved_graph
 
