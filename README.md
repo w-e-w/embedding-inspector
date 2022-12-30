@@ -1,4 +1,4 @@
-# Embedding-inspector extension version 2.56 - 2022.12.30
+# Embedding-inspector extension version 2.57 - 2022.12.31
 
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
@@ -33,6 +33,13 @@ v2.54 Bugfix for upper-case embedding names. Also disabled showing checksum when
 v2.55 Remove zeroed vectors (as an option in the script REMOVE_ZEROED_VECTORS = True)
 
 v2.56 Showing graph of saved embedding is now enabled
+
+v2.57 Added graph for inspected embedding, and button for saving the vector to text file (saved in webui root folder)
+
+Added 'Eval presets' dropdown list, which lets you choose one of the 7 example eval strings, and 'Save for ALL presets' option (careful as this will save 8 embeddings).
+
+
+![image](screenshots/eval_presets.jpg)
 
 # Manual Installation
 
