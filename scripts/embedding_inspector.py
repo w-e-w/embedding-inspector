@@ -6,6 +6,7 @@
 
 import gradio as gr
 from modules import script_callbacks, shared, sd_hijack
+from modules.shared import cmd_opts
 import torch, os
 from modules.textual_inversion.textual_inversion import Embedding
 import math, random
@@ -274,7 +275,7 @@ def do_save(*args):
             preset_name = '_'+EVAL_PRESETS[preset_no*2]
             eval_txt = EVAL_PRESETS[preset_no*2+1]
 
-        save_filename = 'embeddings/'+save_name+preset_name+'.bin'
+        save_filename = os.path.join(cmd_opts.embeddings_dir, save_name+preset_name+'.bin')
         file_exists = os.path.exists(save_filename)
         if (file_exists):
             if not(enable_overwrite):
