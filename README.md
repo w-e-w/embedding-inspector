@@ -1,4 +1,4 @@
-# Embedding-inspector extension version 2.57 - 2022.12.31
+# Embedding-inspector extension version version 2.8 - 2023.01.12
 
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
@@ -36,10 +36,15 @@ v2.56 Showing graph of saved embedding is now enabled
 
 v2.57 Added graph for inspected embedding, and button for saving the vector to text file (saved in webui root folder)
 
-Added 'Eval presets' dropdown list, which lets you choose one of the 7 example eval strings, and 'Save for ALL presets' option (careful as this will save 8 embeddings).
+Added 'Eval presets' dropdown list, which lets you choose one of the 7 example eval strings, and 'Save for ALL presets' option (careful as this will save 8 embeddings, see screenshot at the bottom of this page).
 
+v2.8 Bugfix for saved embeddings not reloading issue. 
 
-![image](screenshots/eval_presets.jpg)
+Some terminology fixes in UI, and SHOW_SIMILARITY_SCORE as an option in script, default is False, change to = True to enable it.
+
+Increased number of mixer lines, click on arrow to show/hide more lines. 
+
+Added 'Binary' eval preset, and made vec_mag, vec_min, vec_max variables available.
 
 # Manual Installation
 
@@ -75,21 +80,24 @@ Embeddings consist of 768 or 1024 numbers, these numbers determine the generated
 
 Enter an embedding name like "cat" in "Name 0" box, type a filename like "evaltest" and check "enable overwrite", enter the eval string in "Eval" box, click "save mixed".  You can check log for errors, and also inspect "evaltest" to see that the values have changed. Then generate the image in txt2img tab with the prompt "evaltest" to see the effect.
 
-In the Eval string, use v as the original vector. Torch and math functions are available.
+In the Eval string, use v as the original vector. Torch and math functions are available. Also following variables are available: vec_mag: magnitude of the vector, vec_min: minimum value in the vector, vec_max: maximum value in the vector
 
 Examples:
 
 Eval "v*2" multiplies by 2, increasing the strength of the embedding
 
-Eval "v-torch.min(v)" shifts all numbers up to the positive range, seems to have no effect.
+Eval "v-vec_min" shifts all numbers up to the positive range, seems to have no effect.
 
-Eval "torch.relu(v)" zeroes all negative numbers.
+Eval "torch.relu(v)" zeroes all negative values.
 
 Eval "torch.abs(v)" makes all values positive.
 
+Eval " v/vec_mag" normalizes the vector (error if magnitude is zero)
+
 Eval " = torch.ceil(v)" rounds all values
 
-If the Eval string starts with "=", evaluation will be done item-wise. Here available variables are : v=original value, i=item no (0:768 or 0:1024), maxi=item count (768 or 1024), n=vector no, maxn=vector count. Also, original values can be accessed as tot_vec[n,i]
+If the Eval string starts with "=", evaluation will be done item-wise. Here available variables are : v=original value, i=item no (0:768 or 0:1024), maxi=item count (768 or 1024), n=vector no, maxn=vector count. Also, original values can be accessed as tot_vec[n,i] 
+
 
 Eval " = v * (i<100)" zeroes items after 100th
 
@@ -112,3 +120,8 @@ Another case is to combine different parts of two embeddings as one, for which y
 
 ![image](screenshots/screenshot9.jpg)
 ![image](screenshots/00007-563623717-catdog.jpeg)
+
+
+# Save for ALL eval presets
+
+![image](screenshots/eval_presets.jpg)
