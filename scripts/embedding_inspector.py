@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.57 - 2022.12.31
+# version 2.8 - 2023.01.12
 #
 
 import gradio as gr
@@ -11,11 +11,14 @@ import torch, os
 from modules.textual_inversion.textual_inversion import Embedding
 import math, random
 
-MAX_NUM_MIX = 6 # number of embeddings that can be mixed
+MAX_NUM_MIX = 16 # number of embeddings that can be mixed
+SHOW_NUM_MIX = 6 # number of mixer lines to show initially
 MAX_SIMILAR_EMBS = 30 # number of similar embeddings to show
 VEC_SHOW_TRESHOLD = 1 # change to 10000 to see all values
 VEC_SHOW_PROFILE = 'default' #change to 'full' for more precision
 SEP_STR = '-'*80 # separator string
+
+SHOW_SIMILARITY_SCORE = False # change to True to enable
 
 ENABLE_GRAPH = True
 ENABLE_SHOW_CHECKSUM = False #slows down listing loaded embeddings
@@ -24,6 +27,7 @@ REMOVE_ZEROED_VECTORS = True #optional
 EVAL_PRESETS = ['None','',
     'Boost','=v*8',
     'Digitize','=math.ceil(v*8)/8',
+    'Binary','=(1*(v>=0)-1*(v<0))/50',
     'Randomize','=v*random.random()',
     'Sine','=v*math.sin(i/maxi*math.pi)',
     'Comb','=v*((i%2)==0)',
@@ -130,6 +134,13 @@ def get_embedding_info(text):
 
 #-------------------------------------------------------------------------------
 
+def score_to_percent(score):
+    if score>1.0:score=1.0
+    if score<-1.0:score=-1.0
+    ang = math.acos(score) / (math.pi/2)
+    per = math.ceil((1-ang)*100)
+    return per
+
 def do_inspect(text):
 
     text = text.strip().lower()
@@ -166,12 +177,6 @@ def do_inspect(text):
 
     torch.set_printoptions(threshold=VEC_SHOW_TRESHOLD,profile=VEC_SHOW_PROFILE)
 
-    """
-    with open('emb_vec.txt', 'w') as f:
-        f.write(str(emb_vec))
-        f.close()
-    """
-
     for v in range(vec_count):
 
         vec_v = emb_vec[v].to(device='cpu',dtype=torch.float32)
@@ -189,7 +194,7 @@ def do_inspect(text):
             continue
 
         results.append('')
-        results.append("Similar embeddings:")
+        results.append("Similar tokens:")
         cos = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
         scores = cos(all_embs, vec_v)
         sorted_scores, sorted_ids = torch.sort(scores, descending=True)
@@ -198,7 +203,12 @@ def do_inspect(text):
         for i in range(0, MAX_SIMILAR_EMBS):
             emb_id = best_ids[i].item()
             emb_name = emb_id_to_name(emb_id, tokenizer)
-            r.append(emb_name+'('+str(emb_id)+')')
+
+            score_str = ''
+            if SHOW_SIMILARITY_SCORE:
+                score_str=' '+str(score_to_percent(sorted_scores[i].item()))+'% '
+
+            r.append(emb_name+'('+str(emb_id)+')'+score_str)
         results.append('   '.join(r))
 
         results.append(SEP_STR)
@@ -340,6 +350,11 @@ def do_save(*args):
                     maxn = vec.shape[0]
                     maxi = vec.shape[1]
                     for n in range(maxn):
+
+                        vec_mag = torch.linalg.norm(vec[n])
+                        vec_min = torch.min(vec[n])
+                        vec_max = torch.max(vec[n])
+
                         if eval_txt.startswith('='):
                             #item-wise eval
                             for i in range(maxi):
@@ -387,9 +402,11 @@ def do_save(*args):
     if anything_saved==True:
 
         results.append('Reloading all embeddings')
-        sd_hijack.model_hijack.embedding_db.dir_mtime=0
-        sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings()
-
+        try: #new way
+            sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings(force_reload=True)
+        except: #old way
+            sd_hijack.model_hijack.embedding_db.dir_mtime=0
+            sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings()
 
         if ENABLE_GRAPH:
             # save graph (for last saved embedding in tot_vec)
@@ -513,7 +530,7 @@ def add_tab():
             with gr.Row():
 
                 with gr.Column(variant='panel'):
-                    text_input = gr.Textbox(label="Text input", lines=1, placeholder="Enter embedding name (only first token is processed), or embedding ID as #nnnnn")
+                    text_input = gr.Textbox(label="Inspect", lines=1, placeholder="Enter token/embedding name or ID as #nnnnn")
                     with gr.Row():
                         inspect_button = gr.Button(value="Inspect", variant="primary")
                         listloaded_button = gr.Button(value="List loaded embeddings")
@@ -540,12 +557,20 @@ def add_tab():
 
                     mix_inputs = []
                     mix_sliders = []
-                    for n in range(MAX_NUM_MIX):
+                    for n in range(SHOW_NUM_MIX):
                         with gr.Row():
                            with gr.Column():
-                               mix_inputs.append(gr.Textbox(label="Name "+str(n), lines=1, placeholder="Enter name of embedding to mix"))
+                               mix_inputs.append(gr.Textbox(label="Name "+str(n), lines=1, placeholder="Enter name of token/embedding or ID"))
                            with gr.Column():
                                mix_sliders.append(gr.Slider(label="Multiplier",value=1.0,minimum=-1.0, maximum=1.0, step=0.1))
+                    if MAX_NUM_MIX>SHOW_NUM_MIX:
+                        with gr.Accordion('',open=False):
+                            for n in range(SHOW_NUM_MIX,MAX_NUM_MIX):
+                                with gr.Row():
+                                   with gr.Column():
+                                       mix_inputs.append(gr.Textbox(label="Name "+str(n), lines=1, placeholder="Enter name of token/embedding or ID"))
+                                   with gr.Column():
+                                       mix_sliders.append(gr.Slider(label="Multiplier",value=1.0,minimum=-1.0, maximum=1.0, step=0.1))
 
                     with gr.Row():
                             with gr.Column():
