@@ -198,7 +198,7 @@ def do_inspect(text):
         cos = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
         scores = cos(all_embs, vec_v)
         sorted_scores, sorted_ids = torch.sort(scores, descending=True)
-        best_ids = sorted_ids[0:MAX_SIMILAR_EMBS].numpy()
+        best_ids = sorted_ids[0:MAX_SIMILAR_EMBS].detach().numpy()
         r = []
         for i in range(0, MAX_SIMILAR_EMBS):
             emb_id = best_ids[i].item()
@@ -225,7 +225,7 @@ def do_inspect(text):
             fig = plt.figure()
             for u in range(emb_vec.shape[0]):
                 x = torch.arange(start=0,end=emb_vec[u].shape[0],step=1)
-                plt.plot(x.numpy(), emb_vec[u].numpy())
+                plt.plot(x.detach().numpy(), emb_vec[u].detach().numpy())
 
             saved_graph = fig2img(fig)
         #except:
@@ -416,7 +416,7 @@ def do_save(*args):
                 fig = plt.figure()
                 for u in range(tot_vec.shape[0]):
                     x = torch.arange(start=0,end=tot_vec[u].shape[0],step=1)
-                    plt.plot(x.numpy(), tot_vec[u].numpy())
+                    plt.plot(x.detach().numpy(), tot_vec[u].detach().numpy())
 
                 saved_graph = fig2img(fig)
             except:
