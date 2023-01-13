@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.8 - 2023.01.12
+# version 2.82 - 2023.01.13
 #
 
 import gradio as gr
@@ -21,6 +21,7 @@ SEP_STR = '-'*80 # separator string
 SHOW_SIMILARITY_SCORE = False # change to True to enable
 
 ENABLE_GRAPH = True
+GRAPH_VECTOR_LIMIT = 8 # max number of vectors to draw in graph
 ENABLE_SHOW_CHECKSUM = False #slows down listing loaded embeddings
 REMOVE_ZEROED_VECTORS = True #optional
 
@@ -224,6 +225,7 @@ def do_inspect(text):
 
             fig = plt.figure()
             for u in range(emb_vec.shape[0]):
+                if u>=GRAPH_VECTOR_LIMIT: break
                 x = torch.arange(start=0,end=emb_vec[u].shape[0],step=1)
                 plt.plot(x.detach().numpy(), emb_vec[u].detach().numpy())
 
@@ -383,6 +385,12 @@ def do_save(*args):
                 if (old_count!=new_count): results.append('Removed '+str(old_count-new_count)+' zeroed vectors, remaining vectors: '+str(new_count))
 
             if tot_vec.shape[0]>0:
+
+                results.append('Final embedding size: '+str(tot_vec.shape[0])+' x '+str(tot_vec.shape[1]))
+
+                if tot_vec.shape[0]>75:
+                    results.append('WARNING: vector count>75, it may not work')
+
                 new_emb = Embedding(tot_vec, save_name)
                 if (step_val!=None):
                     new_emb.step = step_val
@@ -415,6 +423,7 @@ def do_save(*args):
 
                 fig = plt.figure()
                 for u in range(tot_vec.shape[0]):
+                    if u>=GRAPH_VECTOR_LIMIT: break
                     x = torch.arange(start=0,end=tot_vec[u].shape[0],step=1)
                     plt.plot(x.detach().numpy(), tot_vec[u].detach().numpy())
 
@@ -530,7 +539,7 @@ def add_tab():
             with gr.Row():
 
                 with gr.Column(variant='panel'):
-                    text_input = gr.Textbox(label="Inspect", lines=1, placeholder="Enter token/embedding name or ID as #nnnnn")
+                    text_input = gr.Textbox(label="Inspect", lines=1, placeholder="Enter name of token/embedding or token ID as #nnnnn")
                     with gr.Row():
                         inspect_button = gr.Button(value="Inspect", variant="primary")
                         listloaded_button = gr.Button(value="List loaded embeddings")
@@ -557,6 +566,10 @@ def add_tab():
 
                     mix_inputs = []
                     mix_sliders = []
+
+                    global SHOW_NUM_MIX
+                    if SHOW_NUM_MIX>MAX_NUM_MIX: SHOW_NUM_MIX=MAX_NUM_MIX
+
                     for n in range(SHOW_NUM_MIX):
                         with gr.Row():
                            with gr.Column():
