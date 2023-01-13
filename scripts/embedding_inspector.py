@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.82 - 2023.01.13
+# version 2.83 - 2023.01.13
 #
 
 import gradio as gr
@@ -371,7 +371,7 @@ def do_save(*args):
                     tot_vec = vec
                     results.append('Applied eval: "'+eval_txt+'"')
                 except Exception as e:
-                    results.append('Error evaluating: "'+eval_txt+'" - '+str(e))
+                    results.append('🛑 Error evaluating: "'+eval_txt+'" - '+str(e))
 
             if (combine_mode and (tot_vec.shape[0]>1)):
                 results.append('combining '+str(tot_vec.shape[0])+' vectors as 1-vector')
@@ -389,7 +389,7 @@ def do_save(*args):
                 results.append('Final embedding size: '+str(tot_vec.shape[0])+' x '+str(tot_vec.shape[1]))
 
                 if tot_vec.shape[0]>75:
-                    results.append('WARNING: vector count>75, it may not work')
+                    results.append('⚠️WARNING: vector count>75, it may not work 🛑')
 
                 new_emb = Embedding(tot_vec, save_name)
                 if (step_val!=None):
@@ -402,7 +402,7 @@ def do_save(*args):
                     anything_saved = True
 
                 except:
-                    results.append('Error saving "'+save_filename+'" (filename might be invalid)')
+                    results.append('🛑 Error saving "'+save_filename+'" (filename might be invalid)')
 
             #------------- end batch loop
 
@@ -467,7 +467,7 @@ def do_listloaded():
             results.append(''.join(r))
 
         except:
-            results.append('!error!')
+            results.append('🛑 !error!')
             continue
 
     return '\n'.join(results)  # return info string to textbox
