@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.82 - 2023.01.13
+# version 2.83 - 2023.01.13
 #
 
 import gradio as gr
@@ -230,6 +230,7 @@ def do_inspect(text):
                 plt.plot(x.detach().numpy(), emb_vec[u].detach().numpy())
 
             saved_graph = fig2img(fig)
+            plt.close()
         #except:
         #    saved_graph = None
 
@@ -418,7 +419,7 @@ def do_save(*args):
 
         if ENABLE_GRAPH:
             # save graph (for last saved embedding in tot_vec)
-            try:
+            #try:
                 from matplotlib import pyplot as plt
 
                 fig = plt.figure()
@@ -428,8 +429,9 @@ def do_save(*args):
                     plt.plot(x.detach().numpy(), tot_vec[u].detach().numpy())
 
                 saved_graph = fig2img(fig)
-            except:
-                saved_graph = None
+                plt.close()
+            #except:
+            #    saved_graph = None
 
     return '\n'.join(results), saved_graph  # return info string to log textbox and saved_graph
 
