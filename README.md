@@ -1,4 +1,4 @@
-# Embedding-inspector extension version version 2.82 - 2023.01.13
+# Embedding-inspector extension version version 2.83 - 2023.01.13
 
 for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
 
