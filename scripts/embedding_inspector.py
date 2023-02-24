@@ -9,7 +9,7 @@ from modules import script_callbacks, shared, sd_hijack
 from modules.shared import cmd_opts
 import torch, os
 from modules.textual_inversion.textual_inversion import Embedding
-import math, random
+import collections, math, random
 
 MAX_NUM_MIX = 16 # number of embeddings that can be mixed
 SHOW_NUM_MIX = 6 # number of mixer lines to show initially
@@ -40,7 +40,12 @@ EVAL_PRESETS = ['None','',
 
 def get_data():
 
-    loaded_embs = sd_hijack.model_hijack.embedding_db.word_embeddings
+    loaded_embs = collections.OrderedDict(
+        sorted(
+            sd_hijack.model_hijack.embedding_db.word_embeddings.items(),
+            key=lambda x: str(x[0]).lower()
+        )
+    )
 
     embedder = shared.sd_model.cond_stage_model.wrapped
     if embedder.__class__.__name__=='FrozenCLIPEmbedder': # SD1.x detected
