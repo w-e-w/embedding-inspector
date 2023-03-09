@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.83 - 2023.01.13
+# version 2.9 - 2023.03.09
 #
 
 import gradio as gr
@@ -24,6 +24,7 @@ ENABLE_GRAPH = True
 GRAPH_VECTOR_LIMIT = 8 # max number of vectors to draw in graph
 ENABLE_SHOW_CHECKSUM = False #slows down listing loaded embeddings
 REMOVE_ZEROED_VECTORS = True #optional
+EMB_SAVE_EXT = '.pt' #'.bin'
 
 EVAL_PRESETS = ['None','',
     'Boost','=v*8',
@@ -170,6 +171,7 @@ def do_inspect(text):
         results.append('Step: '+str(loaded_emb.step))
         results.append('SD checkpoint: '+str(loaded_emb.sd_checkpoint))
         results.append('SD checkpoint name: '+str(loaded_emb.sd_checkpoint_name))
+        results.append('Filename: '+str(loaded_emb.filename))
 
     vec_count = emb_vec.shape[0]
     vec_size = emb_vec.shape[1]
@@ -292,7 +294,7 @@ def do_save(*args):
             preset_name = '_'+EVAL_PRESETS[preset_no*2]
             eval_txt = EVAL_PRESETS[preset_no*2+1]
 
-        save_filename = os.path.join(cmd_opts.embeddings_dir, save_name+preset_name+'.bin')
+        save_filename = os.path.join(cmd_opts.embeddings_dir, save_name+preset_name+EMB_SAVE_EXT)
         file_exists = os.path.exists(save_filename)
         if (file_exists):
             if not(enable_overwrite):
