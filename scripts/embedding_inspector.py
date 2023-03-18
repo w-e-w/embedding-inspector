@@ -1,7 +1,7 @@
 # Embedding Inspector extension for AUTOMATIC1111/stable-diffusion-webui
 #
 # https://github.com/tkalayci71/embedding-inspector
-# version 2.9 - 2023.03.09
+# version 2.91 - 2023.03.18
 #
 
 import gradio as gr
@@ -20,7 +20,7 @@ SEP_STR = '-'*80 # separator string
 
 SHOW_SIMILARITY_SCORE = False # change to True to enable
 
-ENABLE_GRAPH = True
+ENABLE_GRAPH = False
 GRAPH_VECTOR_LIMIT = 8 # max number of vectors to draw in graph
 ENABLE_SHOW_CHECKSUM = False #slows down listing loaded embeddings
 REMOVE_ZEROED_VECTORS = True #optional
@@ -171,7 +171,8 @@ def do_inspect(text):
         results.append('Step: '+str(loaded_emb.step))
         results.append('SD checkpoint: '+str(loaded_emb.sd_checkpoint))
         results.append('SD checkpoint name: '+str(loaded_emb.sd_checkpoint_name))
-        results.append('Filename: '+str(loaded_emb.filename))
+        if hasattr(loaded_emb, 'filename'):
+            results.append('Filename: '+str(loaded_emb.filename))
 
     vec_count = emb_vec.shape[0]
     vec_size = emb_vec.shape[1]
