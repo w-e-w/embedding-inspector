@@ -6,6 +6,14 @@ I take no credit and was not involved in development of this extension and I hav
 
 If someone wished to maintain this extension please get in contact.
 
+Note:
+
+Unfortunately I was not able to find the latest commit of this repository which has the hash
+
+`448b6d06859557c446fa3f53df5e732a11608537` comment on `2023-03-18T12:01:18Z`
+
+If someone has a copy of this please contact
+
 ---
 ---
 
