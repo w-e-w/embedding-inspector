@@ -1,10 +1,21 @@
+# Notice: For unknown reason the the author of this extension [@tkalayci71](https://github.com/tkalayci71) has deleted his GitHub account<br>This is a re-uploaded clone
+original URL https://github.com/tkalayci71/embedding-inspector
+Since the code is licensed under [Unlicense](LICENSE), I have re-uploaded the repository using a found fork on GitHub.
+
+I take no credit and was not involved in development of this extension and I have no plans to maintaining it.
+
+If someone wished to maintain this extension please get in contact.
+
+---
+---
+
 # Embedding-inspector extension version version 2.83 - 2023.01.13
 
-for ![AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Extensions)
+for [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 
 With this extension you can inspect internal/loaded embeddings and find out which embeddings are similar, and you can mix them to create new embeddings.
 
-Inspired by [Embeddings editor](https://github.com/CodeExplode/stable-diffusion-webui-embedding-editor.git) and ![Tokenizer](https://github.com/AUTOMATIC1111/stable-diffusion-webui-tokenizer.git) extensions.
+Inspired by [Embeddings editor](https://github.com/CodeExplode/stable-diffusion-webui-embedding-editor.git) and [Tokenizer](https://github.com/AUTOMATIC1111/stable-diffusion-webui-tokenizer.git) extensions.
 
 # What's new
 
@@ -48,7 +59,7 @@ Added 'Binary' eval preset, and made vec_mag, vec_min, vec_max variables availab
 
 # Manual Installation
 
-Download ![embedding-inspector-main.zip](https://github.com/tkalayci71/embedding-inspector/archive/refs/heads/main.zip) and extract into extensions folder.
+Download [embedding-inspector-main.zip](https://github.com/w-e-w/embedding-inspector/archive/refs/heads/main.zip) and extract into extensions folder.
 
 # Usage
 
